@@ -1,0 +1,75 @@
+#include <iostream>
+#include <string>
+#include <map>
+
+#include "jdktrie/trie_map.h"
+
+
+template < 
+  typename OSTREAM, typename T1, typename T2 
+  >
+OSTREAM & operator << ( OSTREAM &o, const std::pair<T1,T2> &p )
+{
+  o << "first: ( " << p.first << " ), second: ( " << p.second << " ) ";
+  return o;
+}
+
+template <
+  typename MAP_T, typename OSTREAM
+  >
+const bool find_and_print( const MAP_T &m, const typename MAP_T::key_type &key_to_find, OSTREAM &o )
+{
+  typename MAP_T::const_iterator i = m.find(key_to_find);
+  if( i != m.end() )
+    o << "Found key : '" << key_to_find << "' value = ( " << *i <<  " ) " << std::endl;
+  else
+    o << "Did not find key : '" << key_to_find << "'" << std::endl;
+  return i != m.end();
+}
+
+
+template <typename MAP_T, typename OSTREAM>
+void do_map_test( OSTREAM &o )
+{
+  MAP_T m;
+
+  m[ typename MAP_T::key_type("testing1") ] = 1;
+  
+  m.insert( std::make_pair(typename MAP_T::key_type("testing2"), 2) );
+  m.insert( std::make_pair(typename MAP_T::key_type("jeffrey"), 3) );
+  m.insert( std::make_pair(typename MAP_T::key_type("jeff"), 4) );
+  m.insert( std::make_pair(typename MAP_T::key_type("zzzzipper"), 5) );
+  m.insert( std::make_pair(typename MAP_T::key_type("macintosh"), 6) );
+  
+  o << "Dumping map:" << std::endl;
+
+  for( typename MAP_T::iterator i=m.begin(); i != m.end(); ++i )
+  {
+    o << *i << std::endl;
+  }
+
+
+  o << (find_and_print( m, typename MAP_T::key_type("testing2"), o ) == true);
+  o << (find_and_print( m, typename MAP_T::key_type("testing2x"), o ) == false);
+  o << (find_and_print( m, typename MAP_T::key_type("jeffrey"), o ) == true);
+  o << (find_and_print( m, typename MAP_T::key_type("jeffreyx"), o ) == false);
+  o << (find_and_print( m, typename MAP_T::key_type("jeff"), o ) == true);
+  o << (find_and_print( m, typename MAP_T::key_type("jeffx"), o ) == false);
+  o << (find_and_print( m, typename MAP_T::key_type("zzzzipper"), o ) == true);
+  o << (find_and_print( m, typename MAP_T::key_type("zzzzipperx"), o ) == false);
+  o << (find_and_print( m, typename MAP_T::key_type("macintosh"), o ) == true);
+  o << (find_and_print( m, typename MAP_T::key_type("macintoshx"), o ) == false);
+}
+
+
+int main(int argc, char **argv )
+{
+  std::cout << "Doing test with std::map" << std::endl;
+  do_map_test< std::map< std::string, int > >( std::cout );
+  
+  std::cout << "Doing test with trie_map" << std::endl;
+  do_map_test< trie_map< std::string, int, 64 > >( std::cout );
+  
+  return 0;
+}
+
